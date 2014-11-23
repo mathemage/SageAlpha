@@ -1,0 +1,26 @@
+Hola,          
+               
+Am I missing something or is this rather peculiar:
+
+sage: bool(sin(x) == sin(x+2*pi))
+True
+
+...however:
+
+plot(sin(x) - sin(x+2*pi))
+
+gives out the result:
+http://aleph.sagemath.org/?c=plot%28sin%28%282%2Api%29+%2B+x%29+-+sin%28x%29%2C-100%2C100%29
+               
+Moreover, example below isn't even recognized as an identity:
+
+sage: bool ( sin((2*pi^2 + x)/pi) == sin(x/pi) )
+False
+
+Is this a bug or is it covered somewhere else?
+
+Thanks for replies.
+Duc Trung Ha
+Sage Version 4.8, Release Date: 2012-01-20
+Intel(R) Core(TM) i5-2410M CPU @ 2.30GHz
+Ubuntu 11.10                    

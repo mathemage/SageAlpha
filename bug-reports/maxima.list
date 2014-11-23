@@ -1,0 +1,59 @@
+Hola,
+
+I am sorry if this would come as a completely stupid question but I was really
+amazed at this Maxima's behavior:
+
+When I searched for solution of goniometric equation `tan(x) = 1`::
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(%i22) to_poly_solve(tan(x) = 1, x);
+                                                   %pi
+                                    - 2 %pi %z30 - ---
+                                                    2
+(%o22)                %union([x = - ------------------])
+                                            2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+answer was given to me. On the other hand, when I entered what I consider an
+equivalent form of the very same equation:
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(%i23) to_poly_solve((sin(x)/cos(x)) - 1 = 0, x);
+                                                                   %pi
+                                                    - 4 %pi %z40 - ---
+                      %pi (8 %z40 + 1)                              2
+(%o23) %union(%if(cos(----------------) # 0, [x = - ------------------], 
+                             4                              2
+                                                                        3 %pi
+                                           %union()), [x = 2 %pi %z38 - -----])
+                                                                          4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+output came out. After a brief inspection one can unravel that this solution is
+in fact identical, however, denoted in very much less elegant & transparent
+way.
+
+This may cause some serious troubles to external programs exploiting Maxima's
+functionality. For instance, I discovered this issue while using Sage's `solve`
+command -- original bug can be viewed at
+https://groups.google.com/forum/?hl=en&fromgroups#!topic/sage-support/ys3CASZ3vrs
+
+Similarly, `solve` also is not capable of recognizing `sin/cos` form of `tan`::
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(%i24) solve(tan(x) = 1, x);
+
+solve: using arc-trig functions to get a solution.
+Some solutions will be lost.
+                                        %pi
+(%o24)                             [x = ---]
+                                         4
+(%i25) solve((sin(x)/cos(x)) - 1 = 0, x);
+(%o25)                         [sin(x) = cos(x)]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Is it somehow possible to alter the output for equivalent forms of such
+well-known goniometric functions and thus fix this pseudo-bug?
+
+---
+Duc Trung Ha

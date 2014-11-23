@@ -1,0 +1,48 @@
+Thank you very much for an explanatory reply :-)
+
+Unfortunately I still have some comments...
+
+    I typed this instead, and got a nice line at 0:
+
+    plot(simplify(sin((2*pi) + x) - sin(x)),-100,100)
+
+This is not working for a little bit more complicated arguments, for
+instance, the second sin(x/pi) function:
+http://aleph.sagemath.org/?c=plot%28simplify%28sin%28%282%2Api%5E2+%2B+x%29%2Fpi%29+-+sin%28x%2Fpi%29%29%2C-100%2C100%29
+
+    You could use:
+    bool (sin(((2*pi^2 + x)/pi).expand()).full_simplify() == sin(x/pi))
+
+What a nice hack :-)
+
+Nonetheless, is there a way to do this trick in a more general way? The
+thing is, I need all this for testing periodicity of real-valued
+functions given by user.
+E. g. Through investigating stationary points my program is able to find
+out that 1 candidate for the potential period of `sin(x/pi)` is `2*pi^2`.
+
+Nevertheless, I cannot just test this candidate with:
+||
+iff(x)==f(x +period):...
+now, can I?
+
+||I would need to expand the inner function (which is, in addition to
+that, in general *not* always the inner function) but I can't get access
+to it since the input function is a blackbox for the program.
+
+Is it somehow possible to /force/ full testing of (at least) goniometric
+identities?
+
+    I might consider it a bug that not every identity is used by default,
+
+    but I would add that I expect it to be an unsolvable problem:
+
+    1) We want it fast.
+    2) We want it to use all simplification methods.
+
+In my case I would want that option - can I make Sage to always go this
+way for me?
+
+
+Thanks again for your time
+Duc Trung Ha

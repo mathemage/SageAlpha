@@ -1,0 +1,10 @@
+*.o
+RegEx-DFA
+*.vim
+*.aux
+*.log
+*.out
+*.toc
+*.hi
+tutorials
+src/.sagenb

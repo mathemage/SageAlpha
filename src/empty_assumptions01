@@ -1,0 +1,34 @@
+#log# Automatic Logger file. *** THIS MUST BE THE FIRST LINE ***
+#log# DO NOT CHANGE THIS LINE OR THE TWO BELOW -* coding: UTF-8 *-
+#log# opts = Struct({'__allownew': True,
+ 'interact': 1,
+ 'logfile': 'empty_assumptions01',
+ 'profile': 'sage'})
+#log# args = []
+#log# It is safe to make manual edits below here.
+#log#-----------------------------------------------------------------------
+sage.misc.preparser.load(sage.misc.preparser.base64.b64decode("L2hvbWUvdHJ1bmcvLnNhZ2UvL2luaXQuc2FnZQ=="),globals(),False)
+#?%logstart
+_ip.magic("logstart empty_assumptions01")
+
+Integer(76) : assumptions()
+Integer(77) : forget()
+Integer(78) : assumptions()
+Integer(79) : assume(x-Integer(Integer(1))>Integer(Integer(0)))
+Integer(80) : assumptions()
+Integer(81) : assume(x-Integer(Integer(2))>Integer(Integer(0)))
+Integer(82) : assumptions()
+Integer(83) : assume(x-Integer(Integer(2))>Integer(Integer(0)))
+Integer(84) : assumptions()
+Integer(85) : assumptions()
+Integer(86) : assume(x-Integer(Integer(2))>Integer(Integer(0)))
+Integer(87) : assume(x-Integer(Integer(2))>Integer(Integer(0))); assumptions()
+Integer(88) : assume(x-Integer(Integer(2))>Integer(Integer(0))); assumptions()
+Integer(89) : assume(x-Integer(Integer(2))>Integer(Integer(0))); assumptions()
+Integer(90) : assume(x-Integer(Integer(2))>Integer(Integer(0))); assumptions()
+Integer(91) : assume(x-Integer(Integer(2))>Integer(Integer(0))); assumptions()
+Integer(92) : assume(x>Integer(Integer(2))); assumptions()
+Integer(93) : assume(x>Integer(Integer(2))); assumptions(); forget(x-Integer(Integer(2))>Integer(Integer(0)))
+Integer(94) : assume(x>Integer(Integer(2))); assumptions(); forget(x>Integer(Integer(2)))
+Integer(95) : assumptions()
+Integer(96) : assume(x-Integer(Integer(1))>Integer(Integer(0)))

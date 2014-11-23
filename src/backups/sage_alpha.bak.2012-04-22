@@ -1,0 +1,900 @@
+r"""
+Enhanced solving of easier exercises from mathematical analysis
+(aimed at the difficulty level of freshmen students at the Faculty of
+Mathematics and Physics of the Charles University in Prague, Czech Republic)
+AUTHORS:
+- Duc Trung Ha (2012): initial version
+
+EXAMPLES:
+Investigating a real-valued function::
+    sage:
+
+TODO:
+
+- write your own examples :-)
+
+
+"""
+#*****************************************************************************
+#      Copyright (C) 2012 Duc Trung Ha <mathemage@gmail.com>
+#
+# Distributed under the terms of the GNU General Public License (GPL)
+# as published by the Free Software Foundation; either version 2 of
+# the License, or (at your option) any later version.
+#                 http://www.gnu.org/licenses/
+#*****************************************************************************
+
+# message about source-code reload
+print "sage_alpha.sage reloaded..."
+
+# sample functions
+myfunc0 = 4.2
+myfunc1 = 1/4*(x - 4)*(pi + 4*x)*x
+myfunc2(y) = (2*(y+.5)^2 + 3*(y+.5) + 1)/(y+.5)
+myfunc3 = arctan(3*x) + (6 - pi/2)
+myfunc4 = 1/(x-2) + 3
+myfunc5(y) = y^2 + 3*y
+#myfunc6 = x*(x-2)/((x-2)*(x+10)*(x-3)*log(abs(x))) ... too brutal :-)
+myfunc6 = x+sin(x)
+
+zk5(x) = x*abs(log(abs(x)))
+
+# test sample functions
+def all_investigate(upto=6, prefix="myfunc"):
+    myfuncs = [prefix+str(i) for i in range(upto+1)]
+    for i in range(upto+1): investigate(eval(myfuncs[i]))
+
+def undefined(self):
+    r"""
+    This function returns list of x-coordinates for undefined points of `self`
+    (i.e. out of its domain).
+
+    INPUT:
+        
+    - ``self`` - the tested real-valued function `f`
+        This should be a function from `RR` to `RR`
+
+    OUTPUT:
+
+    a list  -- points for `x` as one of undefined points
+
+    EXAMPLES:
+
+    This example illustrates default usage::
+
+    NOTES:
+
+    This function first finds points lying out of function's domain. Initial
+        version works for simpler (e.g. rational, log()) functions through
+        finding null-points of denominators and of expressions in log()
+        arguments.
+
+    TODO:
+
+    - "brutality" of log() when to_poly_solve="force" is enabled, e.g. see:
+
+        sage: undefined(x*(x-2)/((x-2)*(x+10)*(x-3)))            
+        [-10, 3]
+        sage: undefined(x*(x-2)/((x-2)*(x+10)*(x-3)*log(x)))
+        []
+
+    ...are periodic solutions required? ("force" option too slow...)
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-04-07): initial version
+    """
+    if self.is_real():              # a constant function
+        return []
+
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    x = var('x')
+    assume(x, 'real')
+    fnct(x) = self(x)
+
+    eqns = solve(fnct.simplify_full().denominator() == 0, x,
+            to_poly_solve=True)
+    tmp = [eqn.right() for eqn in eqns if eqn.left() == x]
+
+    eqns2 = solve(fnct.simplify_full().denominator() == 0, x,
+            to_poly_solve="force")
+    tmp += [eqn.right() for eqn in eqns2 if eqn.left() == x]
+
+    undefs = list(set(tmp))
+    undefs.sort()
+    forget(x, 'real')
+    return undefs
+
+def stationary_points(self):
+    r"""
+    This function returns list of tuples with coordinates of stationary points
+    belonging to a real-valued function (of 1 variable).
+
+    INPUT:
+        
+    - ``self`` - the tested real-valued function `f`
+        This should be a function from `RR` to `RR`
+
+    OUTPUT:
+
+    - a list of tuples -- pairs "(x, f(x))" for `x` as one of
+        stationary points
+
+    EXAMPLES:
+
+    This example illustrates default usage::
+
+        sage: g = (y-1)*(y+3)
+        sage: list = stationary_points(g); list
+        [(-1, -4)]
+
+    NOTES:
+
+    This function first finds domain points where 1st derivative equals zero.
+    Consequently, it creates a list of respective pairs of aforementioned
+    points and their functional values. This is done while checking the domain
+    point is of type "(x : real_value)".    
+
+    TODO:
+        
+    - options for restricted domains
+    - what should we do with constant functions? None or Whole `RR`? - `RR`
+    - what does this mean???
+
+        sage: stationary_points(5*x^4+e^x)
+        /home/trung/sage/sage-4.8-linux-64bit-ubuntu_10.04.3_lts-x86_64-Linux/local/bin/sage-ipython:1:
+        DeprecationWarning: Substitution using function-call syntax and unnamed
+        arguments is deprecated and will be removed from a future release of
+        Sage; you can use named arguments instead, like EXPR(x=..., y=...)
+        #!/usr/bin/env python
+        []
+    - exception handling:
+
+        sage: ((sin(x)/x).diff()).solve(x, to_poly_solve=True)
+        (...)
+        TypeError: 'sage.symbolic.expression.Expression' object does not
+        support indexing
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-30): initial version
+    """
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    x = var('x')
+    assume(x, 'real')
+    # "fnct" will now use default variable "x"
+    if self.is_real():              # CONSTANT FUNCTION - TEMPORARY SOLUTION!!
+        return [(-oo,oo)]
+    else:
+        fnct(x) = self(x)
+
+    tmp = solve([fnct.diff(1) == 0], x, to_poly_solve=True)
+    tmp += solve([fnct.diff(1) == 0], x, to_poly_solve="force")
+    x_coords = list(set(tmp))
+
+    stats = [(pt.right(), fnct(x = pt.right())) for pt in x_coords if pt.left()
+            == x and pt.right() in RR]
+    # periodic solutions: simplified functional values
+    for pt in x_coords:
+        if pt.left() == x and pt.right() not in RR and x not in \
+        pt.right().variables():
+            assume(pt.right().variables()[0], 'integer')
+            stats += [(pt.right(), fnct(x=pt.right()).simplify_full())]
+            forget(pt.right().variables()[0], 'integer')
+
+    stats.sort()
+    forget(x, 'real')
+    return stats
+
+def inflection_points(self):
+    r"""
+    This function returns list of tuples with coordinates of inflection points
+    belonging to a real-valued function (of 1 variable).
+
+    INPUT:
+        
+    - ``self`` - the tested real-valued function `f`
+        This should be a function from `RR` to `RR`
+
+    OUTPUT:
+
+    a list of tuples -- pairs "(x, f(x))" for `x` as one of
+        inflection points
+
+    EXAMPLES:
+
+    This example illustrates default usage::
+
+        sage: g = (y-1)*(y+3)*y
+        sage: ls = inflection_points(g); ls    
+        [(-2/3, 70/27)]
+
+    ::
+
+        sage: inflection_points(cos(x))
+        [(1/2*pi + 2*pi*z67, 0), (-1/2*pi + 2*pi*z65, 0)]
+
+    NOTES:
+
+    This function first finds domain points where 2nd derivative equals zero.
+        Consequently, it creates a list of respective pairs of
+        aforementioned points and their functional values. This is done while
+        checking the domain point is of type "(x : real_value)".    
+    
+    TODO:
+        
+    - same as in stationary_points
+    - periodic solutions, e.g.
+
+        sage: h(x) = sin(x)/cos(x)+1 
+        sage: Ih = integral(h,x)    
+        sage: solve(Ih.diff(),x,to_poly_solve=True)
+        [x == 3/4*pi + 2*pi*z281, x == -1/4*pi + 2*pi*z283]
+
+        .subs()
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-31): initial version
+    """
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    x = var('x')
+    assume(x, 'real')
+    # "fnct" will now use default variable "x"
+    if self.is_real():              # CONSTANT FUNCTION - TEMPORARY SOLUTION!!
+        #fnct(x) = self
+        return [(-oo,oo)]
+    else:
+        fnct(x) = self(x)
+
+    tmp = solve([fnct.diff(2) == 0], x, to_poly_solve=True)
+    tmp += solve([fnct.diff(2) == 0], x, to_poly_solve="force")
+    x_coords = list(set(tmp))
+
+    infls = [(pt.right(), fnct(x = pt.right())) for pt in x_coords if pt.left()
+            == x and pt.right() in RR]
+    # periodic solutions: simplified functional values
+    for pt in x_coords:
+        if pt.left() == x and pt.right() not in RR and x not in \
+        pt.right().variables():
+            assume(pt.right().variables()[0], 'integer')
+            infls += [(pt.right(), fnct(x=pt.right()).simplify_full())]
+            forget(pt.right().variables()[0], 'integer')
+
+    infls.sort()
+    forget(x, 'real')
+    return infls
+
+def asymptotes(self):
+    r"""
+    This function returns the function's list of asymptotes (horizontal,
+    vertical and oblique).
+
+    INPUT:
+        
+    - ``self`` - the input real-valued function `f`
+        This should be a function from `RR` to `RR`, even constant function
+        should at least have (though redundant)
+
+    OUTPUT:
+
+    a list -- functions of asymptotes
+
+    EXAMPLES:
+
+    This example illustrates default usage::
+
+    NOTES:
+
+    TODO:
+        
+    - vertical asymptotes (detect_poles="show" displays them in plot!!)
+    - examples&notes for docstring
+    
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-31): initial version
+    """
+    if self() in RR:        # constant function
+        return [ConstantFunction(self())]
+
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    x = var('x')
+    assume(x, 'real')
+    fnct(x) = self(x)
+
+    results = []
+
+    # horizontal asymptote -> -oo in form of y(x) = c
+    c = limit(fnct, x = -oo)
+    if c.is_real():
+        results.append(ConstantFunction(c))
+
+    # horizontal asymptote -> oo in form of y(x) = c
+    c = limit(fnct, x = oo)
+    if c.is_real():
+        results.append(ConstantFunction(c))
+
+    # oblique asymptote -> -oo in form of y(x) = ax+b 
+    a = limit(fnct/x, x = -oo)
+    b = limit(fnct - a*x, x = -oo)
+    if a.is_real() and b.is_real() and a != 0:
+        asy(x) = a*x + b
+        results.append(asy)
+
+    # oblique asymptote -> oo in form of y(x) = ax+b 
+    a = limit(fnct/x, x = oo)
+    b = limit(fnct - a*x, x = oo)
+    if a.is_real() and b.is_real() and a != 0:
+        asy(x) = a*x + b
+        results.append(asy)
+
+    # get rid of duplicities
+    results = list(set(results))
+
+    # vertical asymptotes: undefined points
+    undefs = undefined(self)
+    results.extend([x_coord for x_coord in undefs if limit(fnct, x = x_coord,
+        dir='-') in [-oo,oo] or limit(fnct, x = x_coord, dir='+') in [-oo,oo]])
+
+    forget(x, 'real')
+    return results
+
+def monotonicity(self, type="iso", pure=False):
+    r"""
+    This function returns list of conditions on `x` for non-decreasingness or
+    non-increasingness of `self`.
+
+    INPUT:
+        
+    - ``self`` - the input real-valued function `f`
+        This should be a function from `RR` to `RR`
+    - ``pure`` - boolean (default: false) 
+        If true, search for strictly monotonous parts.
+    - ``type`` - string "iso" or "anti" (default: "iso") 
+        If "iso", search for non-decreasing parts, else for non-increasing
+        parts.
+
+    OUTPUT:
+
+    a list - inequalities in `x` for given type of monotonicity
+
+    EXAMPLES:
+
+    This example illustrates default (i.e. isotonicity) usage::
+
+        sage: monotonicity(x^4-3*x^2+2)
+        [[x >= -1/2*sqrt(2)*sqrt(3), x <= 0], [x >= 1/2*sqrt(2)*sqrt(3)]]
+
+    ::
+
+        sage: monotonicity(x^4-3*x^2+2, pure=True)
+        [[x > -1/2*sqrt(2)*sqrt(3), x < 0], [x > 1/2*sqrt(2)*sqrt(3)]]
+
+    This example illustrates usage of antitonicity::
+
+        sage: monotonicity(x+1/x, type="anti")
+        [[x >= -1, x <= 1]]
+
+    ::
+
+        sage: monotonicity(x+1/x, type="anti", pure=True)
+        [[x > -1, x < 0], [x > 0, x < 1]]
+
+    This example displays behavior for incorrect input::
+
+        sage: monotonicity(x+1/x, type="Ant", pure=True) 
+        Invalid type of monotonicity!
+        []
+
+    TESTS:
+
+        
+    TODO:
+
+    - test_pts = [end_pts[1] - 1] is not ideal point for testing!!
+    - update examples & tests
+    - modify 0.0000000000001 hack
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-04-02): initial version
+    """
+    if type not in ["iso", "anti"]:
+        raise TypeError ('"'+type+"\" is not a valid type of monotonicity.")
+
+    # endpoints of intervals
+    end_pts = [-oo]
+    end_pts.extend([pt[0] for pt in stationary_points(self)])
+    end_pts.append(oo)
+
+    if len(end_pts) < 3:                        # constant function
+        # ...is neither strictly increasing nor decreasing
+        if pure:
+            return []
+        else:
+            return [(-oo,+oo)]
+    else:                                       # non-constant function
+        # tested intervals of monotonicity
+        ints = [ (end_pts[i-1],end_pts[i]) for i in range(1,len(end_pts))]
+
+        # representants for tested intervals of monotonicity
+        test_pts = [end_pts[1] - 1]
+        test_pts.extend( [(it[0]+it[1]+0.00000000001)/2 for it in ints[1:-1]] )
+        test_pts.append(end_pts[-2] + 1)
+
+        # correct form of derivative's function
+        x = var('x')
+        Dself(x) = self.diff(1)(x)
+
+        if type == "iso":
+            if pure:
+                return [ints[i] for i in range(len(ints))
+                        if Dself(x = test_pts[i]) > 0]
+            else:
+                return [ints[i] for i in range(len(ints))
+                        if Dself(x = test_pts[i]) >= 0]
+        elif type == "anti":
+            if pure:
+                return [ints[i] for i in range(len(ints))
+                        if Dself(x = test_pts[i]) < 0]
+            else:
+                return [ints[i] for i in range(len(ints))
+                        if Dself(x = test_pts[i]) <= 0]
+
+def curvature(self, type="convex", pure=False):
+    r"""
+    This function returns list of conditions on `x` for convexity or concavity
+    of `self`.
+
+    INPUT:
+        
+    - ``self`` - the input real-valued function `f`
+        This should be a function from `RR` to `RR`
+    - ``pure`` - boolean (default: false) 
+        If true, search for strictly convex/concave parts.
+    - ``type`` - string "convex" or "concave" (default: "convex") 
+        If "convex", search for convex parts, else for concave parts.
+
+    OUTPUT:
+
+    a list - inequalities in `x` for given type of curvature
+
+    EXAMPLES:
+
+    This example illustrates default (i.e. convexity) usage::
+
+        sage: curvature(x*(x-1)*(x+2))  
+        [[x >= (-1/3)]]
+
+    ::
+
+        sage: curvature(x*(x-1)*(x+2), pure=True)
+        [[x > (-1/3)]]
+
+    This example illustrates usage of concavity::
+
+        sage: curvature(x*(x-1)*(x+2), type="concave")
+        [[x <= (-1/3)]]
+
+    ::
+
+        sage: curvature(x*(x-1)*(x+2), type="concave", pure=True)
+        [[x < (-1/3)]]
+
+    This example displays behavior for incorrect input::
+
+        sage: curvature(x*(x-1)*(x+2), type="cave", pure=True)
+        (...)
+        TypeError: "cave" is not a valid type of curvature.
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-04-02): initial version
+    """
+    if type not in ["convex", "concave"]:
+        raise TypeError ('"'+type+"\" is not a valid type of curvature.")
+
+    # endpoints of intervals
+    end_pts = [-oo]
+    end_pts.extend([pt[0] for pt in inflection_points(self)])
+    end_pts.append(oo)
+
+    if len(end_pts) < 3:                        # constant function
+        # ...is neither strictly convex nor concave
+        if pure:
+            return []
+        else:
+            return [(-oo,+oo)]
+    else:                                       # non-constant function
+        # tested intervals of convexity/concavity
+        ints = [ (end_pts[i-1],end_pts[i]) for i in range(1,len(end_pts))]
+
+        # representants for tested intervals of convexity/concavity
+        test_pts = [end_pts[1] - 1]
+        test_pts.extend( [(it[0]+it[1])/2 for it in ints[1:-1]] )
+        test_pts.append(end_pts[-2] + 1)
+
+        # correct form of 2nd derivative's function
+        x = var('x')
+        Dself2(x) = self.diff(1)(x)
+
+        if type == "convex":
+            if pure:
+                return [ints[i] for i in range(len(ints))
+                        if Dself2(x = test_pts[i]) > 0]
+            else:
+                return [ints[i] for i in range(len(ints))
+                        if Dself2(x = test_pts[i]) >= 0]
+        elif type == "concave":
+            if pure:
+                return [ints[i] for i in range(len(ints))
+                        if Dself2(x = test_pts[i]) < 0]
+            else:
+                return [ints[i] for i in range(len(ints))
+                        if Dself2(x = test_pts[i]) <= 0]
+
+def tangent(self, point):
+    r"""
+    This function returns a tangent line of `self` at `point`.
+
+    INPUT:
+        
+    - ``self`` - the input real-valued function `f`
+        This should be a function from `RR` to `RR`
+    - ``point`` - x-coordinate for point of touch
+
+    OUTPUT:
+
+    a function - linear function (a*x+b) of tangent if it exists; otherwise
+    `[]`
+
+    EXAMPLES:
+
+    This example illustrates default usage::
+
+        sage: tangent(tan(x), 42*pi)
+        x \|--> -42*pi + x
+
+
+    TODO:
+
+    - better way to find out the non-existence of 2nd derivative at given
+      point?
+    - newline at examples of docstring
+
+    AUTHORS:
+    - Duc Trung Ha (2012-04-13): initial version
+    """
+    fnct(x) = self(x)
+    if point in undefined(fnct.diff()):
+        return []
+    else:
+        slope = fnct.diff()(x = point)
+        shift = fnct(x = point)
+        result(x) = slope*(x-point) + shift
+        return result
+
+def extrapolate_period(formula):
+    r"""
+    This function tries to find out the period of given formula.
+
+    INPUT:
+        
+    - ``formula`` - expression with integer dummy variable
+
+    OUTPUT:
+
+    a number/empty list - value expressing the period if successful; otherwise
+    0
+
+    EXAMPLES:
+
+    This example illustrates default usage::
+
+        sage: m = var('m')
+        sage: assume(m, 'integer')
+        
+        sage: extrapolate_period(sqrt(-1/2*pi) + 2*pi*m)
+        2*pi
+
+    ::
+
+        sage: extrapolate_period(sqrt(-1/2*pi + 2*pi*m))
+        0
+
+    TODO:
+
+    AUTHORS:
+    - Duc Trung Ha (2012-04-15): initial version
+    """
+
+    f = formula
+    x = formula.default_variable()
+    if f.is_polynomial(x) and f.degree(x) == 1:
+        return f.subs({x:1}) - f.subs({x:0})
+    else:
+        return 0
+
+def investigate(self, left=-2*pi, right=2*pi, down=-15, up=15, tangents=True,
+        autozoom=0):
+    r"""
+    This function displays a variety of information on given real-valued
+    function, e.g. stationary/inflection points, extremes, asymptotes, its plot
+    etc.
+
+    INPUT:
+        
+    - ``self`` - the input real-valued function `f`
+        This should be a function from `RR` to `RR`
+    - ``left`` - left margin of graph
+    - ``right`` - right margin of graph
+    - ``down`` - down margin of graph
+    - ``up`` - up margin of graph
+    - ``tangents`` - bool (default: True); if True, display graph with tangent
+      lines at the inflection points
+    - ``autozoom`` - float (default: 1.1); if True, rescale the graph by the
+      factor of ``autozoom`` in order to show as much important information
+      (e.g. all reasonable stationary/inflection points, vertical asymptotes
+      etc.)
+
+    OUTPUT:
+
+    a view - typeset document with all the gathered information
+
+    EXAMPLES:
+
+    This example illustrates default usage::
+
+    TODO:
+
+    - plot in .dvi
+    - periodicity (e.g. in goniometric functions)
+    - plots of 1st & 2nd derivatives??
+    - options for colors
+    - examples
+    - scaling graphs (2C all)
+    - periodic solutions -> update for monotonicity function!!!!
+
+
+    Poznamky z emailu k 2012-04-11
+    4) pribuzna funkce (x-2)*exp(1/x) se vykresli skoro spravne, ale
+    je tam matouci "svisla cara" od nuly do minus nekonecna, ktera
+    tam nema co delat (svisle asymptoty by kdyztak mely byt carkovane).
+    -- defaultne to tak ukazuje sage: viz plot((x-2)*exp(1/x))
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-31): initial version
+    - Robert Samal (2012-04-10): choice of color for tangent lines
+    """
+    ###########################################################################
+    # "F(X) = STH(X)" FORM INSTEAD OF "F = STH(X)"
+    if not self.is_real():
+        x = self.default_variable()
+    else:
+        x = var('x')
+    assume(x, 'real')
+    fnct(x) = self
+    ###########################################################################
+
+    print "Function", fnct
+
+    pic = Graphics()
+
+    # coordinates for autozoom
+    ideal_left = oo
+    ideal_right = -oo
+    ideal_down = oo
+    ideal_up = -oo
+
+    ###########################################################################
+    # GENERAL FEATURES
+    if fnct(x) == fnct(-x): print "- even function."
+    if -fnct(x) == fnct(-x): print "- odd function."
+    if self.is_real(): print "- constant function."
+
+    undefs = undefined(fnct)
+    if undefs != []: print "- undefined in: ", undefs
+    ###########################################################################
+
+    print
+
+    ###########################################################################
+    # FEATURES OF 1ST DERIVATIVE
+    stats = stationary_points(fnct)
+    print "- stationary points: ", stats
+    if stats not in [[], [(-oo,oo)]]:
+        for pt in stats:
+            if pt[0] in RR:                    # non-periodic solution
+                pic += point(pt, rgbcolor='red', pointsize=30)
+
+                ideal_left = min(ideal_left, pt[0])
+                ideal_right = max(ideal_right, pt[0])
+                ideal_down = min(ideal_down, pt[1])
+                ideal_up = max(ideal_up, pt[1])
+            elif pt[1] in RR:                  # periodic solution
+                ideal_down = min(ideal_down, pt[1])
+                ideal_up = max(ideal_up, pt[1])
+
+    if not self.is_real():
+        print "- non-decreasing for: ", monotonicity(fnct)
+        print "- increasing for: ", monotonicity(fnct, pure=True)
+        print "- non-increasing for: ", monotonicity(fnct, type="anti")
+        print "- decreasing for: ", monotonicity(fnct, type="anti", pure=True)
+    ###########################################################################
+
+    print
+
+    ###########################################################################
+    # FEATURES OF 2ND DERIVATIVE
+    infls = inflection_points(fnct)
+    print "- inflection points: ", infls
+    if infls not in [[], [(-oo,oo)]]:
+        for pt in infls:
+            if pt[0] in RR:                    # non-periodic solution
+                pic += point(pt, rgbcolor='green', pointsize=30)
+
+                ideal_left = min(ideal_left, pt[0])
+                ideal_right = max(ideal_right, pt[0])
+                ideal_down = min(ideal_down, pt[1])
+                ideal_up = max(ideal_up, pt[1])
+            elif pt[1] in RR:                  # periodic solution
+                ideal_down = min(ideal_down, pt[1])
+                ideal_up = max(ideal_up, pt[1])
+
+    if not self.is_real():
+        print "- convex for: ", curvature(fnct)
+        print "- strictly convex for: ", curvature(fnct, pure=True)
+        print "- concave for: ", curvature(fnct, type="concave")
+        print "- strictly concave for: ", curvature(fnct, type="concave", pure=True)
+    ############################################################################
+
+    print
+
+    ###########################################################################
+    # ASYMPTOTES
+    asmpts = asymptotes(fnct)
+    print "- asymptotes: ", asmpts
+    # definitions of asymptotes
+    for f in asmpts:
+        # vertical asymptote - non-periodic values are pure real numbers
+        if f in RR:
+            ideal_left = min(ideal_left, f)
+            ideal_right = max(ideal_right, f)
+
+        # horizontal & oblique asymptote
+        elif f() in RR or var('x') in f.variables():
+            ideal_down = min(ideal_down, f())
+            ideal_up = max(ideal_up, f())
+    ###########################################################################
+
+    ###########################################################################
+    # AUTOZOOM
+    # default values for margins of graph
+    l = left
+    r = right
+    d = down
+    u = up
+
+    if autozoom != 0:
+        # infinite range -> default range value
+        if ideal_left == oo:
+            ideal_left = left
+        if ideal_right == -oo:
+            ideal_right = right
+        if ideal_up == oo:
+            ideal_up = up
+        if ideal_down == -oo:
+            ideal_down = down
+
+        hradius = abs(ideal_left - ideal_right) / 2 * autozoom
+        vradius = abs(ideal_down - ideal_up) / 2
+
+        hcenter = (ideal_left + ideal_right) / 2
+        vcenter = (ideal_down + ideal_up) / 2
+
+        if hradius != 0:
+            l = (hcenter - hradius).simplify_full()
+            r = (hcenter + hradius).simplify_full()
+        if vradius != 0:
+            d = (vcenter - vradius).simplify_full()
+            u = (vcenter + vradius).simplify_full()
+    ###########################################################################
+
+    ###########################################################################
+    # ADD PLOTS OF ASYMPTOTES & LINES & PERIODIC POINTS
+    # asymptotes
+    for f in asmpts:
+        # vertical asymptote - non-periodic values are pure real numbers
+        if f in RR:
+            pic += line([(f,d), (f,u)], rgbcolor='lightblue',
+                    linestyle="--", thickness=2.4)
+
+        # vertical asymptote - periodic values (no constant function, without x
+        # in formula)
+        elif f() not in RR and var('x') not in f.variables():
+            period = extrapolate_period(f)
+
+            if period == 0:
+                continue
+            # factors (of the period) for the leftest/rightest point
+            # "+1" is for addtive shift, i.e (additive_shift + z89*pi)
+            leftest_factor = ceil(left/period) - 1
+            rightest_factor = floor(right/period) + 1
+
+            rng = range(leftest_factor, rightest_factor+1)
+            for fctr in rng:
+                new_x = f.subs( {f.variables()[0]:fctr} )
+                if left <= new_x and new_x <= right:
+                    pic += line([(f,d), (f,u)], rgbcolor='lightred',
+                            linestyle="--", thickness=2.4)
+
+        # horizontal & oblique asymptote
+        else:
+            pic += line([(l,f().subs({x:l})), (r,f().subs({x:r}))],
+                rgbcolor='lightblue', linestyle="--", thickness=2.4)
+
+    if stats not in [[], [(-oo,oo)]]:
+        for pt in stats:
+            if pt[0] not in RR:                # periodic solution
+                ideal_down = min(ideal_down, pt[1])
+                ideal_up = max(ideal_up, pt[1])
+
+                period = extrapolate_period(pt[0])
+
+                if period == 0:
+                    continue
+                # factors (of the period) for the leftest/rightest point
+                # "+1" is for addtive shift, i.e (additive_shift + z89*pi)
+                leftest_factor = ceil(l/period) - 1
+                rightest_factor = floor(r/period) + 1
+
+                rng = range(leftest_factor, rightest_factor+1)
+                for fctr in rng:
+                    new_x = pt[0].subs( {pt[0].variables()[0]:fctr} )
+                    if l <= new_x and new_x <= r:
+                        pic += point((new_x, fnct(x = new_x)), rgbcolor='red',
+                                pointsize=30)
+
+    # tangent lines & inflections points
+    if infls not in [[], [(-oo,oo)]]:
+        for pt in infls:
+            if pt[0] in RR:                    # non-periodic solution
+                if tangents:
+                    tg(x) = tangent(self, pt[0])
+                    if tg != []:
+                        pic += line([(l, tg(x = l)), (r, tg(x = r))],
+                                rgbcolor='purple', thickness=.5)
+            else:                              # periodic solution
+                period = extrapolate_period(pt[0])
+
+                if period == 0:
+                    continue
+
+                # factors (of the period) for the leftest/rightest point
+                # "+1" is for addtive shift, i.e (additive_shift + z89*pi)
+                leftest_factor = ceil(l/period) - 1
+                rightest_factor = floor(r/period) + 1
+
+                rng = range(leftest_factor, rightest_factor+1)
+                for fctr in rng:
+                    new_x = pt[0].subs( {pt[0].variables()[0]:fctr} )
+                    if l <= new_x and new_x <= r:
+                        pic += point((new_x, fnct(x = new_x)),
+                                rgbcolor='green', pointsize=30)
+
+                        if tangents:
+                            tg(x) = tangent(self, new_x)
+                            if tg != []:
+                                pic += line([(l, tg(x = l)), (r, tg(x = r))],
+                                        rgbcolor='purple', thickness=.5)
+    ###########################################################################
+
+    pl = plot(fnct, xmin=l, xmax=r, ymin=d, ymax=u, rgbcolor='black',
+            detect_poles=True)
+    pic += pl
+    show(pic, xmin=l, xmax=r, ymin=d, ymax=u)
+
+    forget(x, 'real')
+    return

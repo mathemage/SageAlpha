@@ -1,0 +1,47 @@
+Hola,
+
+would anybody be so kind and explain to me the mechanism behind "assume(sth)"?
+
+I strive to understand (without success, unfortunaly) following behavior:
+
+
+sage: assume(x-2 <= 0)
+sage: assumptions()      
+[x - 2 <= 0]
+sage: assume(x-1 <= 0)
+sage: assumptions()   
+[x - 2 <= 0]
+
+"x-1 <= 0" is not redundant here, is it?
+
+
+sage: assume(x<= 1)   
+sage: assumptions()
+[x - 2 <= 0, x <= 1]
+
+...and now it works, with equivalent form "x <= 1". Is there some sort of
+"elite category" of "correct forms" explaining such a vast superiority of "x-1
+<= 0" over "x <= 1" form??
+
+
+sage: assume(x-1<=0)
+sage: assumptions() 
+[x - 2 <= 0, x <= 1]
+
+...just proves the equivalence of aforementioned forms...
+
+
+sage: forget(x-1<=0)
+sage: assumptions() 
+[x <= 1]
+
+...where [x <= 2] should be the correct list of assumptions. This completely
+undermines my understanding of mathematics :-(
+
+What am I doing incorrectly/wrong? Most likely I must have just missed some
+tiny yet important detail...
+
+Duc Trung Ha
+Sage Version 4.8, Release Date: 2012-01-20
+Intel(R) Core(TM) i5-2410M CPU @ 2.30GHz
+Ubuntu 12.04

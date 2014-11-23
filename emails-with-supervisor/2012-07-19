@@ -1,0 +1,69 @@
+Dobry den, vazeny pane doktore Samale,
+
+jak se Vam dari? Omlouvam se, ze jsem se ozval az po delsi dobe, ale to vse
+bylo ciste z toho duvodu, ze po zkouskovem jsem byl na dovolene a jakakoli
+prace (ac ne neprijemna) se s relaxaci moc dobre neslucuje :-)
+
+Po navratu jsem se rozhodl trochu se SageAlpha pohnout dal. Nanestesti (nebo
+mozna prave ze naopak nastesti) jsem hned upgradoval ze Sage 5.0 na Sage 5.1
+a polovina veci prestala fungovat (jak to tak jiz u aktualizaci byvava :-).
+
+Cely tenhle tyden jsem "vychytaval" mista, kde neco selhalo - doufam, ze jsem
+nic nevynechal. Pokud byste si neco preci jen vsiml, jiste se mi ozvete, rad to
+napravim.
+
+Mel bych v teto dobe asi 2 velke dotazy:
+_______________________________________________________________________________
+1) Prijde mi, ze "view" je vylozene staveny na postupne TeXani LaTeXovych
+representaci prvku nejakeho seznamu objektu. Pokud tedy clovek chce udelat
+celistvy dokument, musi neustale "sahat" po nejakem tom "Hacku" typu
+vypnuti/zapnuti math mode a t.p. Treba napr. v soucasne dobe nezvlada
+pokracovat po vlozenem obrazku dalsim textem, stezujic si na:
+
+    ! LaTeX Error: Bad math environment delimiter.
+
+    See the LaTeX manual or LaTeX Companion for explanation.
+    Type  H <return>  for immediate help.
+     ...                                              
+                                                       
+    l.41 \textrm{- odd function.}\]
+
+[toto se ukaze napr. pri zadani `view_investigations(myfunc6)`]
+
+Celkove mi prijde, ze z "view" se dost spatne sazi, neb neni videt, co je v
+okoli ci co tomu predchazi (avsak verim, ze kdyby se clovek pohrabal ve
+zdrojacich "view", tak by na to nakonec prisel, ale neprijde mi to jako moc
+ciste reseni).
+
+Mozna by IMHO bylo primocarejsi, dyby podprogram vygeneroval .tex zdrojak
+(pricemz by clovek presne videl na kod a nemusel by hadat, ze je zapnuty nejaky
+ jiny mod a t.p.). Sage by ho pak prelozil pomoci z vnejsku zavolaneho
+kompilator (treba latex nebo pdflatex).
+
+Slo by to udelat takto?
+
+Pokud ano, nevite, jak zavolat ze Sage kompilator texu, zadat mu soubor k
+"prechroustani" a pote si nechat zobrazit vysledek? Snazil jsem se na to prijit
+ve zdrojaku "view", ale tam je tak nejak zamotane a vola se tam spousta
+podprocedur volajicich dalsi podprocedury...
+_______________________________________________________________________________
+2) pri vysetrovani prubehu fce `myfunc8` selze testovani intervalu monotonie na
+deleni nulou, protoze se tam testovaci bod zkoumaneho intervalu zrovna nahodou
+vybere tak, ze se v 1. derivaci pak nulou deli. Mohl byste mi jen pripomenout,
+jak resit testovani intervalu?
+
+Spolecnymi silami jsme prisli na to, ze by se veci kolem 1. a 2. derivaci
+(monotonie, konvexnost) dali resit pomoci `solve`. Nemuzu si bohuzel presne
+vybavit, jak to bylo - ze by se pridali podminky [a <= x, x <= b] a `solve` by
+resil celou soustavu rovnic? Bylo to takto?
+_______________________________________________________________________________
+
+Kazdopadne Vam v priloze zasilam soucasny stav zdrojaku. `print_investigations`
+vypisuje na konzoli. Dale `view_investigations` a `tex_investigations` TeXaji,
+ale vetsina z nich je zakomentovana, protoze jsou "under construction" (viz
+dotaz 1).
+
+Dekuji Vam predem za odpoved.
+
+Zdravi,
+                        Karel (Duc Trung Ha)

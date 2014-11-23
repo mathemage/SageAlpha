@@ -1,0 +1,33 @@
+Dobry vecer, vazeny pane doktore Samale,
+
+jak se Vam dari? Doufam, ze dobre :-) Po delsi odmlce se Vam opet ozyvam s
+rocnikovym projektem...
+
+Abych byl co nejstrucnejsi:
+
+- poslechl jsem Vasi radu s generovanim oddeleneho TeX zdrojaku. Zatim je to
+pevne "nadratovano" na 1 konkretni soubor v adresari /tmp/, ale to brzo
+poresim. Stejne tak se ve stejnem adresari vytvori stejnojmenne pdfko. (viz
+funkce texie a tex_investigations)
+
+To jsem se chtel zeptat, jak jste to myslel s tim mazanim souboru?
+
+Ma se defaultne pokazde TeX zdrojak smazat nebo to ma byt optional moznost
+(pres argument ve funkci)? A to same i s pdfkem?
+
+- preteceni radku (napr. myfunc2) a obecne dlouhe vzorce (napr. myfunc1):
+U nekterych dloooooooooooooooooooouhych vzorcu mi to pretece pres radku a
+pokracuje dal pres okraj stranky do neznama. Vim, ze jsme to jiz resili, ale
+tehdy jsme odradkovavali (vkladali boxy) po kazdem jednotlivem vzorci, coz
+neni moc elegantni. Navic to nepomuze u jednoho hooodne dlouheho vzorce, ktery
+pretece taky.
+
+Mel jsem dojem, ze to umi TeX vyresit sam (dlouhe vzorce v matematickem modu
+zalomit). Nemate tuseni, proc to nejde?
+
+- pdf v ntb
+Co ma vlastne Sage udelat, pokud je spusten z notebooku? Ma zobrazovat
+prelozene pdfko?
+
+Dekuji za odpoved a preji krasny zbytek vecera
+Karel Ha

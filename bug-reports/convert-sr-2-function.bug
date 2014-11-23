@@ -1,0 +1,13 @@
+convert expression to function
+
+Hola,
+
+is there a way to convert symbolic expression to proper functions?
+
+E. g. `s = sin(x)` into `x |--> sin(x)`
+
+So far I've been using f(x) = s(x), however, deprection warnings occur:
+
+`DeprecationWarning: Substitution using function-call syntax and unnamed
+arguments is deprecated and will be removed from a future release of Sage; you
+can use named arguments instead, like EXPR(x=..., y=...)`

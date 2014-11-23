@@ -1,0 +1,31 @@
+>Dobry vecer, 
+>
+>dekuju za poslani, na oplatku posilam par prikladu, kde to 
+>dela neco jineho, nez by melo. (Typicky chybovou hlasku :) ). 
+>
+>investigate(sin(x)+2*x)
+  => sage: point((pi - arccos(2), 2*pi + sin(pi - arccos(2)) - 2*arccos(2)))
+  (arccos(2) nepatri mezi RR , hodne netransparentni bug!!!!!)
+
+>all_investigate(sin(x))  
+  => jen pomocna fce (pro testovani samplu)
+
+>investigate(log(x)+sin(x))
+  => vyjimka zpusobena to_poly_solve=True (zachytit pres "try")
+  => zachyceno (ale zpomalovani 30s -> 80s -> 160s -> ...)
+
+>inflection_points(x)
+  => vraci [(r1, r1), (c1, c1)], co by melo spravne vracet?
+
+>investigate(sin(x^2)) 
+  => uz funguje (ale jen 1 stat)
+
+>
+>-- ten "autozoom" mi nejak nefunguje: 
+>viz 
+>investigate(sin(x)) 
+>a 
+>investigate(sin(4*x)) 
+>(to by teoreticky mel vyjit stejny obrazek s jinym popisem os, 
+>nebo to spatne chapu?). 
+  => jiz dodelano (v tomhle pripadu uz prepise osy)

@@ -1,0 +1,79 @@
+r"""
+Enhanced solving of easier excercises from mathematical analysis
+(aimed at the difficulty level of freshmen students at the Faculty of
+Mathematics and Physics of the Charles University in Prague, Czech Republic)
+AUTHORS:
+- Duc Trung Ha (2012): initial version
+
+EXAMPLES:
+Inspecting extremes of function::
+    sage: a = Integer(3) ; b = Integer(4)
+    sage: a + b == 7
+    True
+
+Multiplication::
+    sage: a = Integer(3) ; b = Integer(4)
+    sage: a * b == 12
+    True
+    sage: loads((a * 4.0).dumps()) == a*b
+    True
+    sage: a * Rational(2)/5
+    6/5
+
+::
+
+    sage: list([2,3]) * 4
+    [2, 3, 2, 3, 2, 3, 2, 3]
+
+COERCIONS: Returns version of this integer in the multi-precision
+floating real field R.
+
+
+"""
+#*****************************************************************************
+#      Copyright (C) 2012 Duc Trung Ha <mathemage@gmail.com>
+#
+# Distributed under the terms of the GNU General Public License (GPL)
+# as published by the Free Software Foundation; either version 2 of
+# the License, or (at your option) any later version.
+#                 http://www.gnu.org/licenses/
+#*****************************************************************************
+
+print "SageAlpha's code reloaded..."
+
+def stationary_points(self):
+    r"""
+    This function returns dictionary of stationary points belonging to a real
+    function (of 1 variable).
+
+    INPUT:
+        
+    - ``self`` - the input real function `f`
+        Should be a function from `\mathbb{R}` to `\mathbb{R}`
+
+    OUTPUT:
+
+    a dictionary -- the dictionary of pairs "{x: f(x)}" for `x` as one of
+        stationary points
+
+    EXAMPLES:
+
+    This example illustrates default usage:
+
+        sage: g = (y-1)*(y+3)                             
+        sage: list = stationary_points(g); list                   
+        [{-1: -4}]
+
+    NOTES:
+
+    This function first finds domain points where 1st derivative equals zero.
+    Consequently, it creates a dictionary of respective pairs of aforementioned
+    points and their functional values. This is done while checking the domain point is of
+    type "{x : something}". That is because of occasional Sometimes idiosyncrasies
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-30)
+    """
+    x_coords = solve(self.diff() == 0, self.variables()[0], solution_dict=True)
+    return [{x.values()[0] : self(x.values()[0])} for x in x_coords if
+            x.keys()[0] == self.variables()[0]]

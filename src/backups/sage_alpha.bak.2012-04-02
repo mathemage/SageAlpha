@@ -1,0 +1,395 @@
+r"""
+Enhanced solving of easier exercises from mathematical analysis
+(aimed at the difficulty level of freshmen students at the Faculty of
+Mathematics and Physics of the Charles University in Prague, Czech Republic)
+AUTHORS:
+- Duc Trung Ha (2012): initial version
+
+EXAMPLES:
+Investigating extremes of function::
+    sage: a = Integer(3) ; b = Integer(4)
+    sage: a + b == 7
+    True
+
+TODO:
+- write your own examples :-)
+
+
+"""
+#*****************************************************************************
+#      Copyright (C) 2012 Duc Trung Ha <mathemage@gmail.com>
+#
+# Distributed under the terms of the GNU General Public License (GPL)
+# as published by the Free Software Foundation; either version 2 of
+# the License, or (at your option) any later version.
+#                 http://www.gnu.org/licenses/
+#*****************************************************************************
+
+print "sage_alpha.sage reloaded..."
+myfunc0 = 4.2
+myfunc1 = 1/4*(x - 4)*(pi + 4*x)*x
+myfunc2 = (2*x^2 + 3*x + 1)/x
+myfunc3 = arctan(3*x) + (6 - pi/2)
+myfunc4 = 1/(x-2) + 3
+
+def stationary_points(self):
+    r"""
+    This function returns dictionary of stationary points belonging to a real
+    function (of 1 variable).
+
+    INPUT:
+        
+    - ``self`` - the input real function `f`
+        This should be a function from `\mathbb{R}` to `\mathbb{R}`
+
+    OUTPUT:
+
+    a dictionary -- the dictionary of pairs "{x: f(x)}" for `x` as one of
+        stationary points
+
+    EXAMPLES:
+
+    This example illustrates default usage:
+
+        sage: g = (y-1)*(y+3)                             
+        sage: list = stationary_points(g); list                   
+        [{-1: -4}]
+
+    NOTES:
+
+    This function first finds domain points where 1st derivative equals zero.
+        Consequently, it creates a dictionary of respective pairs of
+        aforementioned points and their functional values. This is done while
+        checking the domain point is of type "{x : something}". That is
+        performed because of occasional idiosyncrasies such as:
+    
+        sage: x = var('x')                                              
+        sage: solve(sin(x)/cos(x)+1,x, solution_dict=True)              
+        [{sin(x): -cos(x)}]
+    
+    TODO:
+        
+    - seldom strange behavior -> check for numerical functional values, i.e.
+
+        sage: stationary_points(f)
+        [{-1/6*cos(x): 1/12*cos(x)^2 + sin(-1/6*cos(x))}]
+
+    - options for restricted domains
+    - unable to find some solutions even numerically, e.g.
+
+        sage: k = 5*x^4+e^x           
+        sage: find_root(k.diff(),x,2)
+
+    ::
+
+        sage: investigate(sin(x)+abs(cos(x)))
+        Stationary points:  [(1/2*pi, 1)]
+        Inflection points:  []
+    - what should we do with constant functions? None or Whole `\mathbb{R}`?
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-30)
+    """
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    if not self.is_real():
+        x = self.variables()[0]
+    else:
+        x = var('x')
+    assume(x, 'real')
+    fnct(x) = self
+
+    x_coords = solve(fnct.diff(1) == 0, x, solution_dict=True,
+            to_poly_solve=True)
+    return [{pt.values()[0] : fnct(pt.values()[0])} for pt in x_coords if
+            pt.keys()[0] == x]
+
+def inflection_points(self):
+    r"""
+    This function returns dictionary of inflection points belonging to a real
+    function (of 1 variable).
+
+    INPUT:
+        
+    - ``self`` - the input real function `f`
+        This should be a function from `\mathbb{R}` to `\mathbb{R}`
+
+    OUTPUT:
+
+    a dictionary -- the dictionary of pairs "{x: f(x)}" for `x` as one of
+        inflection points
+
+    EXAMPLES:
+
+    This example illustrates default usage:
+
+    NOTES:
+
+    This function first finds domain points where 2nd derivative equals zero.
+        Consequently, it creates a dictionary of respective pairs of
+        aforementioned points and their functional values. This is done while
+        checking the domain point is of type "{x : something}". That is
+        performed because of occasional idiosyncrasies such as:
+    
+        sage: x = var('x')                                              
+        sage: solve(sin(x)/cos(x)+1,x, solution_dict=True)              
+        [{sin(x): -cos(x)}]
+    
+    TODO:
+        
+    - same as in stationary_points
+    - periodic solutions, e.g.
+
+        sage: h(x) = sin(x)/cos(x)+1 
+        sage: Ih = integral(h,x)    
+        sage: solve(Ih.diff(),x,to_poly_solve=True)
+        [x == 3/4*pi + 2*pi*z281, x == -1/4*pi + 2*pi*z283]
+    
+    - examples for docstring
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-31)
+    """
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    if not self.is_real():
+        x = self.variables()[0]
+    else:
+        x = var('x')
+    assume(x, 'real')
+    fnct(x) = self
+
+    x_coords = solve(fnct.diff(2) == 0, x, solution_dict=True,
+            to_poly_solve=True)
+    return [{pt.values()[0] : fnct(pt.values()[0])} for pt in x_coords if
+            pt.keys()[0] == x]
+
+def asymptotes(self):
+    r"""
+    This function returns the function's list of asymptotes (horizontal,
+    vertical and oblique).
+
+    INPUT:
+        
+    - ``self`` - the input real function `f`
+        This should be a function from `\mathbb{R}` to `\mathbb{R}`
+
+    OUTPUT:
+
+    a list -- functions of asymptotes
+
+    EXAMPLES:
+
+    This example illustrates default usage:
+
+    NOTES:
+
+    TODO:
+        
+    - vertical asymptotes (detect_poles="show" displays them in plot!!)
+    - examples&notes for docstring
+    
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-31)
+    """
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    if not self.is_real():
+        x = self.variables()[0]
+    else:
+        x = var('x')
+    assume(x, 'real')
+    fnct(x) = self
+
+    results = []
+
+    # horizontal asymptote -> -oo in form of y(x) = c
+    c = limit(fnct, x = -oo)
+    if c.is_real():
+        asy(x) = c
+        results.append(asy)
+
+    # horizontal asymptote -> oo in form of y(x) = c
+    c = limit(fnct, x = oo)
+    if c.is_real():
+        asy(x) = c
+        results.append(asy)
+
+    # oblique asymptote -> -oo in form of y(x) = ax+b 
+    a = limit(fnct/x, x = -oo)
+    b = limit(fnct - a*x, x = -oo)
+    if a.is_real() and b.is_real():
+        asy(x) = a*x + b
+        results.append(asy)
+
+    # oblique asymptote -> oo in form of y(x) = ax+b 
+    a = limit(fnct/x, x = oo)
+    b = limit(fnct - a*x, x = oo)
+    if a.is_real() and b.is_real():
+        asy(x) = a*x + b
+        results.append(asy)
+
+    return list(set(results))
+
+def isotonicity(self, pure=False):
+    r"""
+    This function returns list of conditions on `x` for non-decreasing `self`.
+
+    INPUT:
+        
+    - ``self`` - the input real function `f`
+        This should be a function from `\mathbb{R}` to `\mathbb{R}`
+    - ``pure`` - boolean (default: false) 
+        If true, search for strictly increasing (not non-decreasing) parts.
+
+    OUTPUT:
+
+    a list - inequalities in `x` for isotonicity of `self`
+
+    EXAMPLES:
+
+    This example illustrates default usage:
+
+        sage: isotonicity(x^4-3*x^2+2)
+        [[x >= -1/2*sqrt(2)*sqrt(3), x <= 0], [x >= 1/2*sqrt(2)*sqrt(3)]]
+
+    ::
+
+        sage: isotonicity(x^4-3*x^2+2, pure=True)
+        [[x > -1/2*sqrt(2)*sqrt(3), x < 0], [x > 1/2*sqrt(2)*sqrt(3)]]
+
+    TODO:
+
+    - works only on rational inequalities (try e.g. sin(x), e^x etc.) ->
+      solution via Taylor series??
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-04-01)
+    """
+    if pure:
+        return solve_ineq(self.diff() > 0)
+    else:
+        return solve_ineq(self.diff() >= 0)
+
+def antitonicity(self, pure=False):
+    r"""
+    This function returns list of conditions on `x` for non-increasing `self`.
+
+    INPUT:
+        
+    - ``self`` - the input real function `f`
+        This should be a function from `\mathbb{R}` to `\mathbb{R}`
+    - ``pure`` - boolean (default: false) 
+        If true, search for strictly decreasing (not non-increasing) parts.
+
+    OUTPUT:
+
+    a list - inequalities in `x` for antitonicity of `self`
+
+    EXAMPLES:
+
+    This example illustrates default usage:
+
+        sage: antitonicity(x+1/x)           
+        [[x >= -1, x <= 1]]
+
+    ::
+
+        sage: antitonicity(x+1/x, pure=True)
+        [[x > -1, x < 0], [x > 0, x < 1]]
+
+
+    TODO:
+
+    - same issues as with isotonicity 
+    - strange behavior of the example above (for non-pure version)
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-04-01)
+    """
+    if pure:
+        return solve_ineq(self.diff() < 0)
+    else:
+        return solve_ineq(self.diff() <= 0)
+
+def investigate(self, left=-2*pi, right=2*pi, down=-15, up=15):
+    r"""
+    This function displays a variety of information on given real function,
+        e.g. stationary/inflection points, extremes, asymptotes, its plot etc.
+
+    INPUT:
+        
+    - ``self`` - the input real function `f`
+        This should be a function from `\mathbb{R}` to `\mathbb{R}`
+
+    OUTPUT:
+
+    a view - typeset document with all the gathered information
+
+    EXAMPLES:
+
+    This example illustrates default usage:
+
+    TODO:
+
+    - plot in .dvi
+    - periodicity (e.g. in goniometric functions)
+    - options for colors
+    - examples for docstring
+
+
+    AUTHORS:
+    - Duc Trung Ha (2012-03-31)
+    """
+    # "f(x) = sth(x)" form instead of "f = sth(x)"
+    if not self.is_real():
+        x = self.variables()[0]
+    else:
+        x = var('x')
+    assume(x, 'real')
+    fnct(x) = self
+
+    print "Function", fnct
+
+    if fnct(x) == fnct(-x): print "- even function."
+    if -fnct(x) == fnct(-x): print "- odd function."
+
+    print
+
+    stats = [(pt.keys()[0],pt.values()[0]) for pt in stationary_points(fnct) if
+            pt.keys()[0] in RR]
+    print "- stationary points: ", stats
+    stat_pts = point(stats, rgbcolor='orange', pointsize=40)
+    pic = stat_pts
+
+    if not self.is_real():
+        print "- non-decreasing for: ", isotonicity(fnct)
+        print "- increasing for: ", isotonicity(fnct, pure=True)
+        print "- non-increasing for: ", antitonicity(fnct)
+        print "- decreasing for: ", antitonicity(fnct, pure=True)
+    else:
+        print "- constant function."
+
+    print
+
+    infls = [(pt.keys()[0],pt.values()[0]) for pt in inflection_points(fnct) if
+            pt.keys()[0] in RR]
+    print "- inflection points: ", infls
+    infl_pts = point(infls, rgbcolor='green', pointsize=40)
+    pic += infl_pts
+
+    print
+
+    asmpts = asymptotes(fnct)
+    print "- asymptotes: ", asmpts
+    for f in asmpts:
+        pic += line([(left,f(left)), (right,f(right))], rgbcolor='blue',
+                linestyle="--")
+
+    pl = plot(fnct, left, right, rgbcolor='black', detect_poles="show")
+    pic += pl
+
+    show(pic, ymin=down, ymax=up)
+
+    return

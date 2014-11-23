@@ -1,0 +1,28 @@
+Hola,
+
+I was wondering about following eerie behavior of "solve" function:
+
+On the one hand, "force" value of "to_poly_solve" option seems to be more
+powerful as for periodicity of solutions:
+
+sage: solve(tan(x)==1,x,to_poly_solve=True)
+[x == 1/4*pi]
+sage: solve(tan(x)==1,x,to_poly_solve="force")
+[x == 1/4*pi + pi*z275]
+
+On the other hand, "True" value of "to_poly_solve" occasionally gives out
+better outputs:
+
+sage: solve(sin(x)/cos(x)-1,x,to_poly_solve=True)   
+[x == 1/4*pi + pi*z299]
+sage: solve(sin(x)/cos(x)-1,x,to_poly_solve="force")          
+[]
+
+However, "tan(x)==1" appears to me as an equivalent form of
+"sin(x)/cos(x)-1==0".
+
+Is this a bug or is it covered somewhere else?
+Duc Trung Ha
+Sage Version 4.8, Release Date: 2012-01-20
+Intel(R) Core(TM) i5-2410M CPU @ 2.30GHz
+Ubuntu 11.10

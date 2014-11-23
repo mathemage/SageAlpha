@@ -1,0 +1,27 @@
+Hola,
+
+I'm stuck at the problem of determinating whether a given expression is known to be real number or not.
+
+So far, I've been testing this either with
+expr.is_real()
+or
+expr in RR
+succesfully.
+
+Now, if I give Sage this expression of real number:
+-1/12*pi + 1/12*sqrt(16*pi + pi^2 + 256) + 4/3
+the following results will occur:
+http://aleph.sagemath.org/?z=eJxLVLBV0DXUNzTSKshU0FYAs4oLi0o0DM0gIgWZcUZAysjUTBNImegbc3EVFGXmlSgk6mUWxxelJuZoaMKFFDLzFIKCAHCUFik%3D
+
+On the other hand, non-real value below:
+arccos(2)
+would produce the very same results, though it should give opposite results for at least 1 test:
+http://aleph.sagemath.org/?c=a+%3D+arccos%282%29%0A%0Aprint+a.is_real%28%29%0A%0Aprint+a+in+RR
+
+Is there any other/standard way to test membership to real numbers?
+
+Is this a bug or is it covered somewhere else?
+Duc Trung Ha
+Sage Version 4.8, Release Date: 2012-01-20
+Intel(R) Core(TM) i5-2410M CPU @ 2.30GHz
+Ubuntu 12.04
